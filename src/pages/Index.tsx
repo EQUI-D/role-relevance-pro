@@ -1,14 +1,44 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import { useState, useEffect } from "react";
+import LoaderScreen from "@/components/LoaderScreen";
+import LoginScreen from "@/components/LoginScreen";
+import StudentDashboard from "@/components/StudentDashboard";
+import PlacementDashboard from "@/components/PlacementDashboard";
 
 const Index = () => {
-  return (
-    <div className="flex min-h-screen items-center justify-center bg-background">
-      <div className="text-center">
-        <h1 className="mb-4 text-4xl font-bold">Welcome to Your Blank App</h1>
-        <p className="text-xl text-muted-foreground">Start building your amazing project here!</p>
-      </div>
-    </div>
-  );
+  const [currentScreen, setCurrentScreen] = useState<'loading' | 'login' | 'dashboard'>('loading');
+  const [user, setUser] = useState<any>(null);
+
+  const handleLoaderComplete = () => {
+    setCurrentScreen('login');
+  };
+
+  const handleLogin = (userType: 'student' | 'placement', userData: any) => {
+    setUser({ ...userData, type: userType });
+    setCurrentScreen('dashboard');
+  };
+
+  const handleLogout = () => {
+    setUser(null);
+    setCurrentScreen('login');
+  };
+
+  if (currentScreen === 'loading') {
+    return <LoaderScreen onComplete={handleLoaderComplete} />;
+  }
+
+  if (currentScreen === 'login') {
+    return <LoginScreen onLogin={handleLogin} />;
+  }
+
+  if (currentScreen === 'dashboard' && user) {
+    if (user.type === 'student') {
+      return <StudentDashboard user={user} onLogout={handleLogout} />;
+    } else {
+      return <PlacementDashboard user={user} onLogout={handleLogout} />;
+    }
+  }
+
+  return null;
 };
 
 export default Index;
